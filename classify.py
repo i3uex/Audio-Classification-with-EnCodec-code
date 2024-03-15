@@ -1,7 +1,10 @@
 from utils import perform_training
 
-datasets = ["genres"]
-models = ["48khz", "24khz", "melspectrogram"]
+datasets = [
+    "speech_music",
+    "genres",
+]
+models = ["melspectrogram", "24khz", "48khz"]
 
 for dataset in datasets:
     for model in models:
