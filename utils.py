@@ -39,12 +39,15 @@ def load_dataset(dataset_name, model_name, classes, max_items_per_folder=100):
         for klass in classes:
             glob_str = f"{dataset_base_folder}/{klass}/*"
             _X = [load_function(path) for path in glob.glob(glob_str)[:max_items_per_folder]]
+            if len(_X) == 0:
+                print(f"No files found for {klass} in {glob_str}")
+                continue
             if X is None:
-                X = np.array(_X)
+                X = np.concatenate(_X)
             else:
                 X = np.concatenate([X, np.concatenate(_X)])
             Y.extend([[1. if klass == x else 0. for x in classes]]*(len(X)-len(Y)))
-        Y = np.array(Y)
+        Y = np.array(Y, dtype=np.float32)
         X = np.array(X)
         np.save(X_file_path, X)
         np.save(Y_file_path, Y)
