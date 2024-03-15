@@ -1,0 +1,4 @@
+numpy
+librosa
+matplotlib
+git+https://git@github.com/facebookresearch/encodec#egg=encodec
