@@ -11,9 +11,11 @@ DATASETS_BASE_PATH = "/path/to/datasets"
 DATASET2BASE_FOLDER = {
     "genres": f"{DATASETS_BASE_PATH}/GTZAN Genres",
     "speech_music": f"{DATASETS_BASE_PATH}/GTZAN Speech_Music",
+    "env": f"{DATASETS_BASE_PATH}/ESC-50-master/classes",
 }
 
 DATASET2CLASSES = {
+    "env": ['airplane', 'breathing', 'brushing_teeth', 'can_opening', 'car_horn', 'cat', 'chainsaw', 'chirping_birds', 'church_bells', 'clapping', 'clock_alarm', 'clock_tick', 'coughing', 'cow', 'crackling_fire', 'crickets', 'crow', 'crying_baby', 'dog', 'door_wood_creaks', 'door_wood_knock', 'drinking_sipping', 'engine', 'fireworks', 'footsteps', 'frog', 'glass_breaking', 'hand_saw', 'helicopter', 'hen', 'insects', 'keyboard_typing', 'laughing', 'mouse_click', 'pig', 'pouring_water', 'rain', 'rooster', 'sea_waves', 'sheep', 'siren', 'sneezing', 'snoring', 'thunderstorm', 'toilet_flush', 'train', 'vacuum_cleaner', 'washing_machine', 'water_drops', 'wind'],
     "genres": ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"],
     "speech_music": ["speech", "music"],
 }

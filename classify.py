@@ -3,6 +3,7 @@ from utils import perform_training
 datasets = [
     "speech_music",
     "genres",
+    "env",
 ]
 models = ["melspectrogram", "24khz", "48khz"]
 
