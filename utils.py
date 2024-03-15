@@ -81,6 +81,8 @@ def train_loop(X, Y, classification_model, optimizer=torch.optim.SGD, lr=0.01, c
     val_loss = []
     train_acc = []
     val_acc = []
+    best_val_loss = float("inf")
+    best_model = None
     for epoch in range(epochs):
         correct = 0
         for i, (inputs, labels) in enumerate(train_loader):
@@ -103,18 +105,22 @@ def train_loop(X, Y, classification_model, optimizer=torch.optim.SGD, lr=0.01, c
                 _, predicted = torch.max(outputs.data, 1)
                 correct += (predicted == torch.max(labels.data, 1)[1]).sum()
         v_loss = _loss.item()
+        if v_loss < best_val_loss:
+            best_val_loss = v_loss
+            best_model = classification_model.state_dict()
         val_loss.append(v_loss)
         val_accuracy = 100 * (correct.item()) / len(val_set)
         val_acc.append(val_accuracy)
         if epoch % 10 == 0:
             print(f'{epoch}/{epochs} - Train Loss: {t_loss}. Train Accuracy: {train_accuracy}. Val Loss: {v_loss}. Val Accuracy: {val_accuracy}')
-    return train_loss, val_loss, train_acc, val_acc
+    return train_loss, val_loss, train_acc, val_acc, best_model
 
 
 def perform_training(dataset_name, model_name, results_folder="results"):
     classes = DATASET2CLASSES[dataset_name]
     X, Y = load_dataset(dataset_name, model_name, classes)
-    train_loss, val_loss, train_acc, val_acc = train_loop(X, Y, get_MNIST_train_model(len(classes)))
+    train_loss, val_loss, train_acc, val_acc, best_model = train_loop(X, Y, get_MNIST_train_model(len(classes)))
+    torch.save(best_model, f"classify_{dataset_name}_{model_name}_model.pth")
     if not os.path.exists(results_folder):
         os.mkdir(results_folder)
     with open(f"{results_folder}/classify_{dataset_name}_{model_name}_train_acc.json", "w") as f:
