@@ -115,7 +115,7 @@ def perform_training(dataset_name, model_name, results_folder="results"):
     classes = DATASET2CLASSES[dataset_name]
     X, Y = load_dataset(dataset_name, model_name, classes)
     train_loss, val_loss, train_acc, val_acc = train_loop(X, Y, get_MNIST_train_model(len(classes)))
-    if os.path.exists(results_folder):
+    if not os.path.exists(results_folder):
         os.mkdir(results_folder)
     with open(f"{results_folder}/classify_{dataset_name}_{model_name}_train_acc.json", "w") as f:
         json.dump(train_acc, f)
