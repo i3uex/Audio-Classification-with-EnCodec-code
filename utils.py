@@ -7,9 +7,10 @@ import torch
 from torch.utils.data import DataLoader
 from loaders import get_load_function
 
+DATASETS_BASE_PATH = "/path/to/datasets"
 DATASET2BASE_FOLDER = {
-    "genres": "/path/to/GTZAN Genres",
-    "speech_music": "/path/to/GTZAN Speech_Music",
+    "genres": f"{DATASETS_BASE_PATH}/GTZAN Genres",
+    "speech_music": f"{DATASETS_BASE_PATH}/GTZAN Speech_Music",
 }
 
 DATASET2CLASSES = {
