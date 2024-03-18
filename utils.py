@@ -56,12 +56,12 @@ def load_dataset(dataset_name, model_name, classes, max_items_per_folder=100):
     return X, Y
 
 
-def get_MNIST_train_model(classes, feature_len=128, kernel_size=5):
+def get_MNIST_train_model(classes, channels=128, feature_len=128, kernel_size=5):
     return torch.nn.Sequential(
-        torch.nn.Conv1d(128, feature_len, kernel_size),
+        torch.nn.Conv1d(channels, feature_len, kernel_size),
         torch.nn.MaxPool1d(kernel_size),
         torch.nn.ReLU(),
-        torch.nn.Conv1d(128, feature_len*2, kernel_size),
+        torch.nn.Conv1d(feature_len, feature_len*2, kernel_size),
         torch.nn.Dropout1d(),
         torch.nn.MaxPool1d(kernel_size),
         torch.nn.ReLU(),
