@@ -5,7 +5,7 @@ import random
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
-from loaders import get_load_function
+from loaders import get_loader_model
 
 DATASETS_BASE_PATH = "/path/to/datasets"
 DATASET2BASE_FOLDER = {
@@ -29,7 +29,7 @@ def shuffle(a, b):
 
 def load_dataset(dataset_name, model_name, classes, max_items_per_folder=100):
     dataset_base_folder = DATASET2BASE_FOLDER[dataset_name]
-    load_function = get_load_function(model_name)
+    loader_model = get_loader_model(model_name)
     X_file_path = f"X_{dataset_name}_{model_name}.npy"
     Y_file_path = f"Y_{dataset_name}_{model_name}.npy"
     if os.path.exists(X_file_path) and os.path.exists(Y_file_path):
@@ -40,7 +40,7 @@ def load_dataset(dataset_name, model_name, classes, max_items_per_folder=100):
         X = None
         for klass in classes:
             glob_str = f"{dataset_base_folder}/{klass}/*"
-            _X = [load_function(path) for path in glob.glob(glob_str)[:max_items_per_folder]]
+            _X = [loader_model.load(path) for path in glob.glob(glob_str)[:max_items_per_folder]]
             if len(_X) == 0:
                 print(f"No files found for {klass} in {glob_str}")
                 continue
