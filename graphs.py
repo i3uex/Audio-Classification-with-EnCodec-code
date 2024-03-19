@@ -3,6 +3,9 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 
+GRAPH_TITLE = True
+GRAPH_LEGEND = True
+GRAPH_TRAINING_DATA = False
 datasets = [
     "speech_music",
     "genres",
@@ -10,6 +13,7 @@ datasets = [
 ]
 result_folder = "results"
 models = ["melspectrogram", "24khz", "48khz"]
+
 
 
 def smooth(scalars: List[float], weight: float) -> List[float]:  # Weight between 0 and 1
@@ -35,13 +39,16 @@ for dataset_name in datasets:
             train_loss = json.load(f)
         with open(f"{result_folder}/classify_{dataset_name}_{model_name}_val_loss.json") as f:
             val_loss = json.load(f)
-        plt.plot(smooth(train_acc, 0.8), label=model_name + " train Accuracy")
+        if GRAPH_TRAINING_DATA:
+            plt.plot(smooth(train_acc, 0.8), label=model_name + " train Accuracy")
         plt.plot(smooth(val_acc, 0.8), label=model_name + " validation Accuracy")
         print("Train Loss", np.min(train_loss))
         print("Train Accuracy", np.max(train_acc))
         print("Validation Loss", np.min(val_loss))
         print("Validation Accuracy", np.max(val_acc))
         print("---------------------------------------------------")
-    plt.legend()
-    plt.title(f"{dataset_name} Accuracy")
+    if GRAPH_LEGEND:
+        plt.legend()
+    if GRAPH_TITLE:
+        plt.title(f"{dataset_name} Accuracy")
     plt.show()
