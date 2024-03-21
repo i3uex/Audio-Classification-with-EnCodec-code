@@ -6,6 +6,36 @@ import librosa
 from encodec.utils import convert_audio
 
 
+def np_window(x: np.array, window_seconds=2, step_seconds=1, sr=22050) -> np.ndarray:
+    """
+    Apply a window to the audio
+    :param x: Audio in np array format
+    :param window_seconds: seconds of the window
+    :param step_seconds: seconds of the step
+    :param sr: sample rate of the audio
+    :return: windowed audio
+    """
+    window_frames = int(window_seconds * sr)
+    step_frames = int(step_seconds * sr)
+    shape = (x.size - window_frames + 1, window_frames)
+    strides = x.strides * 2  # * window ??
+    return np.lib.stride_tricks.as_strided(x, strides=strides, shape=shape, writeable=False)[0::step_frames]
+
+
+def torch_window(x: np.array, window_seconds=2, step_seconds=1, sr=22050) -> np.ndarray:
+    """
+    Apply a window to the audio
+    :param x: Audio in np array format
+    :param window_seconds: seconds of the window
+    :param step_seconds: seconds of the step
+    :param sr: sample rate of the audio
+    :return: windowed audio
+    """
+    window_frames = int(window_seconds * sr)
+    step_frames = int(step_seconds * sr)
+    return x.unfold(-1, window_frames, step_frames)
+
+
 def load_encodec_model(model_name):
     from encodec import EncodecModel
 
@@ -41,15 +71,9 @@ class AudioClassifierModelEncodecBase(AudioClassifierModelBase):
     def load(self, path):
         print(path)
         wav, sr = torchaudio.load(path)
-        wav = convert_audio(wav, sr, self.model.sample_rate, self.model.channels)
-        wav = wav.unsqueeze(0)
-        encoded_frames = []
-        win = self.model.sample_rate * self.window_size
-        for offset in range(0, wav.shape[-1], win):
-            frame = wav[:, :, offset: offset + win]
-            frame = F.pad(frame, (0, win - frame.shape[-1]), "constant", 0)
-            encoded_frames.append(self.encoder(frame.to("cuda:0")).detach().cpu().numpy()[0])
-        return np.array(encoded_frames)
+        wav = convert_audio(wav, sr, self.model.sample_rate, self.model.channels).unsqueeze(0)
+        windowed_items = torch_window(wav, sr=self.model.sample_rate).transpose(0, 2).transpose(1, 2)
+        return np.array([self.encoder(item.to("cuda:0")).detach().cpu()[0] for item in windowed_items])
 
 
 class AudioClassifierModelEncodec(AudioClassifierModelEncodecBase):
@@ -71,11 +95,9 @@ class AudioClassifierModelLibrosa(AudioClassifierModelBase):
     def load(self, path):
         print(path)
         wav, sr = librosa.load(path, mono=True)
-        win = int(sr * self.window_size)
         encoded_frames = []
-        for offset in range(0, wav.shape[-1], win):
-            frame = wav[offset: offset + win]
-            frame = np.pad(frame, (0, win - frame.shape[-1]), "constant")
+        windowed_items = np_window(wav, sr=sr)
+        for frame in windowed_items:
             encoded_frames.append(
                 librosa.feature.melspectrogram(
                     y=frame,
