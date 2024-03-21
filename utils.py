@@ -70,23 +70,39 @@ def get_MNIST_train_model(classes, channels=128, feature_len=128, kernel_size=5)
     ).to("cuda:0")
 
 
-def train_loop(X, Y, classification_model, optimizer=torch.optim.SGD, lr=0.01, criterion=torch.nn.CrossEntropyLoss, epochs=500, val_size=0.2, batch_size=256):
+def check_step(loader, classification_model, criterion):
+    correct = 0
+    for inputs, labels in loader:
+        outputs = classification_model(inputs.to("cuda:0")).cpu()
+        _loss = criterion(outputs, labels)
+        _, predicted = torch.max(outputs.data, 1)
+        correct += (predicted == torch.max(labels.data, 1)[1]).sum()
+    return correct, _loss
+
+
+def train_loop(X, Y, classification_model, optimizer=torch.optim.SGD, lr=0.01, criterion=torch.nn.CrossEntropyLoss, epochs=500, val_size=0.2, test_size=0.2, batch_size=256):
     criterion = criterion()
     optimizer = optimizer(classification_model.parameters(), lr=lr)
-    val_size = int(len(X)*val_size)
+    train_size = 1-val_size-test_size
+    val_index = int(len(X) * train_size)
+    test_index = int(len(X) * (train_size+val_size))
     X, Y = shuffle(X, Y)
-    train_set = list(zip(X[:-val_size], Y[:-val_size]))
-    val_set = list(zip(X[-val_size:], Y[-val_size:]))
-    train_loader = DataLoader(dataset=train_set, batch_size = batch_size)
-    val_loader = DataLoader(dataset=val_set, batch_size = batch_size)
-    train_loss = []
-    val_loss = []
-    train_acc = []
-    val_acc = []
+    train_set = list(zip(X[:val_index], Y[:val_index]))
+    train_loader = DataLoader(dataset=train_set, batch_size=batch_size)
+    val_set = list(zip(X[val_index:test_index], Y[val_index:test_index]))
+    val_loader = DataLoader(dataset=val_set, batch_size=batch_size)
+    test_set = list(zip(X[test_index:], Y[test_index:]))
+    test_loader = DataLoader(dataset=test_set, batch_size=batch_size)
+    all_train_loss = []
+    all_val_loss = []
+    all_train_acc = []
+    all_val_acc = []
     best_val_loss = float("inf")
     best_model = None
+    # Perform training
     for epoch in range(epochs):
         correct = 0
+        # Iterate over train set
         for i, (inputs, labels) in enumerate(train_loader):
             optimizer.zero_grad()
             outputs = classification_model(inputs.to("cuda:0")).cpu()
@@ -95,41 +111,50 @@ def train_loop(X, Y, classification_model, optimizer=torch.optim.SGD, lr=0.01, c
             optimizer.step()
             _, predicted = torch.max(outputs.data, 1)
             correct += (predicted == torch.max(labels.data, 1)[1]).sum()
+        # Compute train metrics
         t_loss = loss.item()
-        train_loss.append(t_loss)
+        all_train_loss.append(t_loss)
         train_accuracy = 100 * (correct.item()) / len(train_set)
-        train_acc.append(train_accuracy)
+        all_train_acc.append(train_accuracy)
         correct = 0
+        # Compute validation accuracy and loss and save best model
         with torch.no_grad():
-            for inputs, labels in val_loader:
-                outputs = classification_model(inputs.to("cuda:0")).cpu()
-                _loss = criterion(outputs, labels)
-                _, predicted = torch.max(outputs.data, 1)
-                correct += (predicted == torch.max(labels.data, 1)[1]).sum()
+            correct, _loss = check_step(val_loader, classification_model, criterion)
+        # Compute validation metrics
         v_loss = _loss.item()
         if v_loss < best_val_loss:
             best_val_loss = v_loss
             best_model = classification_model.state_dict()
-        val_loss.append(v_loss)
+        all_val_loss.append(v_loss)
         val_accuracy = 100 * (correct.item()) / len(val_set)
-        val_acc.append(val_accuracy)
+        all_val_acc.append(val_accuracy)
         if epoch % 10 == 0:
             print(f'{epoch}/{epochs} - Train Loss: {t_loss}. Train Accuracy: {train_accuracy}. Val Loss: {v_loss}. Val Accuracy: {val_accuracy}')
-    return train_loss, val_loss, train_acc, val_acc, best_model
+
+    classification_model.load_state_dict(best_model)
+    with torch.no_grad():
+        correct, _loss = check_step(test_loader, classification_model, criterion)
+    t_loss = _loss.item()
+    test_acc = 100 * (correct.item()) / len(test_set)
+
+    print(f'Test Loss: {t_loss}. Test Accuracy: {test_acc}')
+    return all_train_loss, all_val_loss, t_loss, all_train_acc, all_val_acc, test_acc, best_model
 
 
 def perform_training(dataset_name, model_name, results_folder="results"):
     classes = DATASET2CLASSES[dataset_name]
     X, Y = load_dataset(dataset_name, model_name, classes)
-    train_loss, val_loss, train_acc, val_acc, best_model = train_loop(X, Y, get_MNIST_train_model(len(classes)))
+    train_loss, val_loss, test_loss, train_acc, val_acc, test_acc, best_model = train_loop(X, Y, get_MNIST_train_model(len(classes)))
     torch.save(best_model, f"classify_{dataset_name}_{model_name}_model.pth")
     if not os.path.exists(results_folder):
         os.mkdir(results_folder)
-    with open(f"{results_folder}/classify_{dataset_name}_{model_name}_train_acc.json", "w") as f:
-        json.dump(train_acc, f)
-    with open(f"{results_folder}/classify_{dataset_name}_{model_name}_train_loss.json", "w") as f:
-        json.dump(train_loss, f)
-    with open(f"{results_folder}/classify_{dataset_name}_{model_name}_val_acc.json", "w") as f:
-        json.dump(val_acc, f)
-    with open(f"{results_folder}/classify_{dataset_name}_{model_name}_val_loss.json", "w") as f:
-        json.dump(val_loss, f)
+    with open(f"{results_folder}/classify_{dataset_name}_{model_name}.json", "w") as f:
+        json.dump(
+            {
+                'train_loss': train_loss,
+                'val_loss': val_loss,
+                'test_loss': test_loss,
+                'train_acc': train_acc,
+                'val_acc': val_acc,
+                'test_acc': test_acc
+            }, f)
