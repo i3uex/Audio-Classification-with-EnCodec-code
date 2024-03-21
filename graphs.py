@@ -31,21 +31,18 @@ for dataset_name in datasets:
     for model_name in models:
         print("----", model_name, "for dataset:"
                                   "", dataset_name, "----")
-        with open(f"{result_folder}/classify_{dataset_name}_{model_name}_train_acc.json") as f:
-            train_acc = json.load(f)
-        with open(f"{result_folder}/classify_{dataset_name}_{model_name}_val_acc.json") as f:
-            val_acc = json.load(f)
-        with open(f"{result_folder}/classify_{dataset_name}_{model_name}_train_loss.json") as f:
-            train_loss = json.load(f)
-        with open(f"{result_folder}/classify_{dataset_name}_{model_name}_val_loss.json") as f:
-            val_loss = json.load(f)
+        with open(f"{result_folder}/classify_{dataset_name}_{model_name}.json") as f:
+            data = json.load(f)
+
         if GRAPH_TRAINING_DATA:
-            plt.plot(smooth(train_acc, 0.8), label=model_name + " train Accuracy")
-        plt.plot(smooth(val_acc, 0.8), label=model_name + " validation Accuracy")
-        print("Train Loss", np.min(train_loss))
-        print("Train Accuracy", np.max(train_acc))
-        print("Validation Loss", np.min(val_loss))
-        print("Validation Accuracy", np.max(val_acc))
+            plt.plot(smooth(data['train_acc'], 0.8), label=model_name + " train Accuracy")
+        plt.plot(smooth(data['val_acc'], 0.8), label=model_name + " validation Accuracy")
+        print("Train Loss", np.min(data['train_loss']))
+        print("Train Accuracy", np.max(data['train_acc']))
+        print("Validation Loss", np.min(data['val_loss']))
+        print("Validation Accuracy", np.max(data['val_acc']))
+        print("Test Loss", data['test_loss'])
+        print("Test Accuracy", data['test_acc'])
         print("---------------------------------------------------")
     if GRAPH_LEGEND:
         plt.legend()
