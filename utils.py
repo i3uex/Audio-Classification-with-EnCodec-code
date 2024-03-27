@@ -19,6 +19,8 @@ DATASET2CLASSES = {
     "genres": ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"],
     "speech_music": ["speech", "music"],
 }
+WINDOW_SECONDS = 1
+STEP_SECONDS = 1
 
 
 def shuffle(a, b):
@@ -27,11 +29,11 @@ def shuffle(a, b):
     return zip(*c)
 
 
-def load_dataset(dataset_name, model_name, classes, max_items_per_folder=100):
+def load_dataset(dataset_name, model_name, classes, max_items_per_folder=100, win_seconds=WINDOW_SECONDS, step_seconds=STEP_SECONDS):
     dataset_base_folder = DATASET2BASE_FOLDER[dataset_name]
-    loader_model = get_loader_model(model_name)
-    X_file_path = f"X_{dataset_name}_{model_name}.npy"
-    Y_file_path = f"Y_{dataset_name}_{model_name}.npy"
+    loader_model = get_loader_model(model_name, win_seconds, step_seconds)
+    X_file_path = f"X_{dataset_name}_{model_name}_win{win_seconds}_step{step_seconds}.npy"
+    Y_file_path = f"Y_{dataset_name}_{model_name}_win{win_seconds}_step{step_seconds}.npy"
     if os.path.exists(X_file_path) and os.path.exists(Y_file_path):
         X = np.load(X_file_path).astype(np.float32)
         Y = np.load(Y_file_path).astype(np.float32)

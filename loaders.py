@@ -54,8 +54,9 @@ def load_encodec_model(model_name):
 
 
 class AudioClassifierModelBase(metaclass=abc.ABCMeta):
-    def __init__(self, window_size=1):
+    def __init__(self, window_size=1, step_size=1):
         self.window_size = window_size
+        self.step_size = step_size
 
     @abc.abstractmethod
     def load(self, path):
@@ -72,7 +73,7 @@ class AudioClassifierModelEncodecBase(AudioClassifierModelBase):
         print(path)
         wav, sr = torchaudio.load(path)
         wav = convert_audio(wav, sr, self.model.sample_rate, self.model.channels).unsqueeze(0)
-        windowed_items = torch_window(wav, sr=self.model.sample_rate).transpose(0, 2).transpose(1, 2)
+        windowed_items = torch_window(wav, sr=self.model.sample_rate, window_seconds=self.window_size, step_seconds=self.step_size).transpose(0, 2).transpose(1, 2)
         return np.array([self.encoder(item.to("cuda:0")).detach().cpu()[0] for item in windowed_items])
 
 
@@ -96,7 +97,7 @@ class AudioClassifierModelLibrosa(AudioClassifierModelBase):
         print(path)
         wav, sr = librosa.load(path, mono=True)
         encoded_frames = []
-        windowed_items = np_window(wav, sr=sr)
+        windowed_items = np_window(wav, sr=sr, window_seconds=self.window_size, step_seconds=self.step_size)
         for frame in windowed_items:
             encoded_frames.append(
                 librosa.feature.melspectrogram(
@@ -110,7 +111,7 @@ class AudioClassifierModelLibrosa(AudioClassifierModelBase):
         return np.array(encoded_frames)
 
 
-def get_loader_model(model_name):
+def get_loader_model(model_name, win, step):
     if model_name in ["24khz", "48khz"]:
         return AudioClassifierModelEncodec(model_name)
     elif model_name == "melspectrogram":
