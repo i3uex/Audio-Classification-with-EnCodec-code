@@ -28,24 +28,38 @@ def smooth(scalars: List[float], weight: float) -> List[float]:  # Weight betwee
 
 
 for dataset_name in datasets:
-    for model_name in models:
-        print("----", model_name, "for dataset:"
-                                  "", dataset_name, "----")
+    ax = plt.gca()
+    for i, model_name in enumerate(models):
+        print("----", model_name, "for dataset:", dataset_name, "----")
         with open(f"{result_folder}/classify_{dataset_name}_{model_name}.json") as f:
             data = json.load(f)
-
         if GRAPH_TRAINING_DATA:
-            plt.plot(smooth(data['train_acc'], 0.8), label=model_name + " train Accuracy")
-        plt.plot(smooth(data['val_acc'], 0.8), label=model_name + " validation Accuracy")
-        print("Train Loss", np.min(data['train_loss']))
-        print("Train Accuracy", np.max(data['train_acc']))
-        print("Validation Loss", np.min(data['val_loss']))
-        print("Validation Accuracy", np.max(data['val_acc']))
+            ax.plot(smooth(data['train_acc'], 0.8), label=model_name + " train Accuracy")
+        ax.plot(smooth(data['val_acc'], 0.8), label=model_name + (" validation Accuracy" if GRAPH_TRAINING_DATA else ""))
         print("Test Loss", data['test_loss'])
         print("Test Accuracy", data['test_acc'])
-        print("---------------------------------------------------")
+        if i == 2:  # 1 for 24khz, 2 for 48khz
+            # Get epoch where melspectrogram accuracy is already better than max
+            epc = np.argwhere(data['val_acc'] > desired_acc)[0][0]
+            # Annotate the point
+            ax.annotate(f'{round(data["val_acc"][epc], 2)}%: Already better than max\nmelspectrogram accuracy ({round(desired_acc, 2)}%)\nat epoch {epc}',
+                            xy=(epc, desired_acc),
+                            xycoords='data',
+                            xytext=(0.5, 0.5),
+                            textcoords='figure fraction',
+                            horizontalalignment='left',
+                            verticalalignment='bottom',
+                        arrowprops=dict(facecolor='black', shrink=0.125, width=1, headwidth=7.5))
+            ax.scatter(epc, desired_acc, color="red", marker="x", s=100)
+        # Get mel spectrogram max accuracy and loss
+        elif i == 0:
+            desired_acc = np.max(data['val_acc'])
+    # Plot max melspectrogram accuracy
+    ax.plot([desired_acc]*len(data['val_acc']), label="Max melspectrogram accuracy", linestyle="--", color="gray")
     if GRAPH_LEGEND:
-        plt.legend()
+        ax.legend()
     if GRAPH_TITLE:
         plt.title(f"{dataset_name} Accuracy")
+    ax.set_ylim(0, 100)
     plt.show()
+    print("---------------------------------------------------")
