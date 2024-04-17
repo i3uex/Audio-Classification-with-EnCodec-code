@@ -13,15 +13,12 @@ for _file in ['brahms', 'libri1']:
 
     # Generate mel spectrogram
     mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, n_fft=512, hop_length=128)
-    plt.imshow(mel, interpolation='nearest', aspect='auto')
-    plt.title("Mel-frequency spectrogram")
-    plt.show()
 
     # Convert mel spectrogram to dB for better visualization
     S_dB = librosa.power_to_db(mel, ref=np.max)
     plt.imshow(S_dB, interpolation='nearest', aspect='auto')
     plt.title("Mel-frequency spectrogram in dB")
-    plt.show()
+    plt.savefig(f"{_file}_mel.png")
 
     # Generate encodec 48Khz featuremap
     encodec_model_48khz = EncodecModel.encodec_model_48khz()
@@ -31,7 +28,7 @@ for _file in ['brahms', 'libri1']:
 
     plt.title("Encodec 48Khz featuremap")
     plt.imshow(E, interpolation='nearest', aspect='auto')
-    plt.show()
+    plt.savefig(f"{_file}_48k.png")
 
     # Generate encodec 24Khz featuremap
     encodec_model_24khz = EncodecModel.encodec_model_24khz()
@@ -42,4 +39,4 @@ for _file in ['brahms', 'libri1']:
 
     plt.title("Encodec 24Khz featuremap")
     plt.imshow(E, interpolation='nearest', aspect='auto')
-    plt.show()
+    plt.savefig(f"{_file}_24k.png")
