@@ -7,9 +7,9 @@ mv datasets/GTZAN\ Speech_Music/speech_wav datasets/GTZAN\ Speech_Music/speech
 mv datasets/GTZAN\ Speech_Music/music_wav datasets/GTZAN\ Speech_Music/music
 
 # GTZAN Genre Dataset
-curl -L -o gtzan-genre-collection.zip  https://www.kaggle.com/api/v1/datasets/download/carlthome/gtzan-genre-collection
-unzip gtzan-genre-collection.zip -d "datasets/GTZAN Genre"
-rm gtzan-genre-collection.zip
+curl -L -o gtzan-dataset-music-genre-classification.zip https://www.kaggle.com/api/v1/datasets/download/andradaolteanu/gtzan-dataset-music-genre-classification
+unzip gtzan-dataset-music-genre-classification.zip -d "datasets/GTZAN Genre"
+rm gtzan-dataset-music-genre-classification.zip
 
 # ESC-50 Dataset
 curl -L -o ESC-50.zip  https://github.com/karoldvl/ESC-50/archive/master.zip

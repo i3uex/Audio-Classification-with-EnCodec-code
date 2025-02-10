@@ -53,9 +53,9 @@ Can be downloaded from [here](https://www.kaggle.com/datasets/andradaolteanu/gtz
 
 ```
 #!/bin/bash
-curl -L -o gtzan-genre-collection.zip  https://www.kaggle.com/api/v1/datasets/download/carlthome/gtzan-genre-collection
-unzip gtzan-genre-collection.zip -d "datasets/GTZAN Genre"
-rm gtzan-genre-collection.zip
+curl -L -o gtzan-dataset-music-genre-classification.zip https://www.kaggle.com/api/v1/datasets/download/andradaolteanu/gtzan-dataset-music-genre-classification
+unzip gtzan-dataset-music-genre-classification.zip -d "datasets/GTZAN Genre"
+rm gtzan-dataset-music-genre-classification.zip
 ```
 
 
