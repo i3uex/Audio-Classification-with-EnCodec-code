@@ -19,7 +19,7 @@ DATASET2CLASSES = {
     "genres": ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"],
     "speech_music": ["speech", "music"],
 }
-WINDOW_SECONDS = 1
+WINDOW_SECONDS = 2
 STEP_SECONDS = 1
 
 
@@ -82,7 +82,7 @@ def check_step(loader, classification_model, criterion):
     return correct, _loss
 
 
-def train_loop(X, Y, classification_model, optimizer=torch.optim.SGD, lr=0.01, criterion=torch.nn.CrossEntropyLoss, epochs=500, val_size=0.2, test_size=0.2, batch_size=256):
+def train_loop(X, Y, classification_model, optimizer=torch.optim.SGD, lr=0.01, criterion=torch.nn.CrossEntropyLoss, epochs=1000, val_size=0.2, test_size=0.2, batch_size=256):
     criterion = criterion()
     optimizer = optimizer(classification_model.parameters(), lr=lr)
     train_size = 1-val_size-test_size
