@@ -99,3 +99,20 @@ In order to train the models, you can run the following script:
 python3 classify.py
 ```
 
+## Citing This Work
+
+If you use this work in your research, please cite us with the following BibTeX entry:
+
+```
+@article{perianezpascual25,
+    title = {Beyond Spectrograms: Rethinking Audio Classification from EnCodec's Latent Space},
+    author = {Perianez-Pascual, Jorge and Gutiérrez, Juan D. and Escobar-Encinas, Laura and Rubio-Largo, Álvaro and Rodriguez-Echeverria, Roberto},
+    doi = {10.3390/a18020108},
+    journal = {Algorithms},
+    langid = {english},
+    month = {February},
+    number = {2},
+    volume = {18},
+    year = {2025}
+}
+```

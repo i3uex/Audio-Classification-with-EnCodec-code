@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: If you use this software, please cite both the article from preferred-citation and the software itself.
+authors:
+  - family-names: Perianez-Pascual
+    given-names: Jorge
+  - family-names: Gutiérrez
+    given-names: Juan D.
+  - family-names: Escobar-Encinas
+    given-names: Laura
+  - family-names: Rubio-Largo
+    given-names: Álvaro
+  - family-names: Rodriguez-Echeverria
+    given-names: Roberto
+title: 'Beyond Spectrograms: Rethinking Audio Classification from EnCodec''s Latent Space'
+version: 1.0.0
+doi: 10.3390/a18020108
+date-released: '2025-02-16'
+preferred-citation:
+  authors:
+    - family-names: Perianez-Pascual
+      given-names: Jorge
+    - family-names: Gutiérrez
+      given-names: Juan D.
+    - family-names: Escobar-Encinas
+      given-names: Laura
+    - family-names: Rubio-Largo
+      given-names: Álvaro
+    - family-names: Rodriguez-Echeverria
+      given-names: Roberto
+  title: 'Beyond Spectrograms: Rethinking Audio Classification from EnCodec''s Latent Space'
+  doi: 10.3390/a18020108
+  type: article-journal
+  year: '2025'
+  conference: {}
+  publisher: {}
