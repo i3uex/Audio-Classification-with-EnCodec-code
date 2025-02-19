@@ -101,7 +101,7 @@ python3 classify.py
 
 ## Citing This Work
 
-If you use this work in your research, please cite us with the following BibTeX entry:
+This repository contains the code required to reproduce the experiments from our paper, ["Beyond Spectrograms: Rethinking Audio Classification from EnCodec's Latent Space"][paper]. If you use this work in your research, please cite it using the following BibTeX entry:
 
 ```
 @article{perianezpascual25,
@@ -116,3 +116,5 @@ If you use this work in your research, please cite us with the following BibTeX 
     year = {2025}
 }
 ```
+
+[paper]: https://doi.org/10.3390/a18020108 "Beyond Spectrograms: Rethinking Audio Classification from EnCodec's Latent Space"
