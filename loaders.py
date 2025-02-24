@@ -74,7 +74,7 @@ class AudioClassifierModelEncodecBase(AudioClassifierModelBase):
         wav, sr = torchaudio.load(path)
         wav = convert_audio(wav, sr, self.model.sample_rate, self.model.channels).unsqueeze(0)
         windowed_items = torch_window(wav, sr=self.model.sample_rate, window_seconds=self.window_size, step_seconds=self.step_size).transpose(0, 2).transpose(1, 2)
-        return np.array([self.encoder(item.to("cuda:0")).detach().cpu()[0] for item in windowed_items])
+        return np.array([self.encoder(item.to("cuda:0")).detach().cpu()[0] for item in windowed_items], dtype="object")
 
 
 class AudioClassifierModelEncodec(AudioClassifierModelEncodecBase):
